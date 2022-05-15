@@ -114,7 +114,7 @@ val persistenceMock: PersistenceMocker = {
         TestCase.UPDATE_ID_NAME_NOT_CONSISTENT -> {
             val pm: PersistenceManager = mockk()
             every { pm.get("C1234567891") } returns Customer(
-                name = "Jack Franco",
+                name = "Jack",
                 id = "C1234567891"
             )
             pm

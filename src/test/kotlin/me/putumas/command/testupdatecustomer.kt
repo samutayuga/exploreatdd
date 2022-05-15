@@ -49,17 +49,6 @@ class TestUpdateCustomer {
                         creditRating = 555
                     ),
                     ERR_MSG_NAME_ID_IS_MANDATORY
-                ),
-                Arguments.of(
-                    "Negative Test to verify the behaviour when id and name is not match",
-                    Customer(
-                        name = "Jack",
-                        id = "C1234567891",
-                        reasonForUpdate = "Customer have bought new palace",
-                        address = "Bt Batok",
-                        creditRating = 555
-                    ),
-                    String.format(ERR_MSG_CUST_ID_NAME_NOT_CONSISTENT, "C1234567891", "Jack")
                 )
 
             )
@@ -136,7 +125,22 @@ class TestUpdateCustomer {
      */
     @Test
     fun updateCustomerIdNameInconsistent() {
-
+        CommandExecutor.persistenceManager = buildPersistenceMock(TestCase.UPDATE_ID_NAME_NOT_CONSISTENT)
+        val exceptionInconsistency = assertFailsWith<InvalidCustomerDataException> {
+            updateCustomer(
+                Customer(
+                    name = "Jack Franco",
+                    id = "C1234567891",
+                    reasonForUpdate = "Customer have bought new palace",
+                    address = "Bt Batok",
+                    creditRating = 555
+                )
+            )
+        }
+        assertEquals(
+            String.format(ERR_MSG_CUST_ID_NAME_NOT_CONSISTENT, "C1234567891", "Jack"),
+            exceptionInconsistency.message
+        )
     }
 
     /**
