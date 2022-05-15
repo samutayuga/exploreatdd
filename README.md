@@ -1,4 +1,4 @@
-# My Fun Toy
+# Test Driven Development
 
 ## What
 
@@ -57,4 +57,6 @@ execution relies on build.gradle
 
 `TDD approach`
 
-We should stop at some point at early phase of dev,to not continue with in implementation but write unit test
+We should stop at some point at early phase of dev,
+to not continue with in implementation but write unit test
+

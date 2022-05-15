@@ -8,7 +8,7 @@ data class Customer(
     val name: String,
     val id: String,
     val address: String? = null,
-    val creditRating: Int? = 0,
+    val creditRating: Int = 0,
     val reasonForUpdate: String? = null
 )
 
@@ -34,7 +34,7 @@ interface PersistenceManager {
     fun insert(customer: Customer): Int
 
     fun get(id: String): Customer?
-//    fun update(customer: Customer)
+    fun update(customer: Customer): Int
 //    fun delete(id: String)
 //    fun list(): List<Customer>
 }

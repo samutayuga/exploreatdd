@@ -19,7 +19,11 @@ enum class TestCase {
     INSERT_DUPLICATE_ENTRY,
     INSERT_NOMINAL_CASE,
     GET_NO_DATA,
-    GET_NOMINAL
+    GET_NOMINAL,
+    UPDATE_NOMINAL_CR,
+    UPDATE_NOMINAL_ADDRESS,
+    UPDATE_NOMINAL_CR_ADDRESS,
+    UPDATE_ID_NAME_NOT_CONSISTENT
 }
 
 typealias PersistenceMocker = (TestCase) -> PersistenceManager
@@ -50,6 +54,69 @@ val persistenceMock: PersistenceMocker = {
         TestCase.GET_NOMINAL -> {
             val pm: PersistenceManager = mockk()
             every { pm.get("C1234567891") } returns Customer("Jack", "C1234567891")
+            pm
+        }
+        TestCase.UPDATE_NOMINAL_CR -> {
+            val pm: PersistenceManager = mockk()
+            every { pm.get("C1234567891") } returns Customer(
+                name = "Jack",
+                id = "C1234567891"
+            )
+            every {
+                pm.update(
+                    Customer(
+                        name = "Jack",
+                        id = "C1234567891",
+                        creditRating = 555,
+                        reasonForUpdate = "Salary hikes incredibly"
+                    )
+                )
+            } returns 1
+            pm
+        }
+        TestCase.UPDATE_NOMINAL_ADDRESS -> {
+            val pm: PersistenceManager = mockk()
+            every { pm.get("C1234567891") } returns Customer(
+                name = "Jack",
+                id = "C1234567891"
+            )
+            every {
+                pm.update(
+                    Customer(
+                        name = "Jack",
+                        id = "C1234567891",
+                        reasonForUpdate = "Customer have bought new palace",
+                        address = "Blue Mountain"
+                    )
+                )
+            } returns 1
+            pm
+        }
+        TestCase.UPDATE_NOMINAL_CR_ADDRESS -> {
+            val pm: PersistenceManager = mockk()
+            every { pm.get("C1234567891") } returns Customer(
+                name = "Jack",
+                id = "C1234567891"
+            )
+            every {
+                pm.update(
+                    Customer(
+                        name = "Jack",
+                        id = "C1234567891",
+                        reasonForUpdate = "Pay increase then bought new palace",
+                        address = "Bt Batok",
+                        creditRating = 555
+                    )
+                )
+            } returns 1
+            pm
+        }
+        TestCase.UPDATE_ID_NAME_NOT_CONSISTENT -> {
+            val pm: PersistenceManager = mockk()
+            every { pm.get("C1234567891") } returns Customer(
+                name = "Jack Franco",
+                id = "C1234567891"
+            )
             pm
         }
     }

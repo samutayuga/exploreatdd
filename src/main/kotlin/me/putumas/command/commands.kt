@@ -8,6 +8,9 @@ import me.putumas.pesistence.PersistenceManager
 const val ERR_MSG_NAME_ID_IS_MANDATORY = "Both 'name' and 'id' are required"
 const val ERR_MSG_CUST_ID_INVALID = "%s does not follow C1234567891 format"
 const val ERR_MSG_CUST_NOT_FOUND = "Customer with id '%s' does does not exist"
+const val ERR_MSG_CUST_ID_NAME_NOT_CONSISTENT = "Customer with id '%s' and name %s has different name in the system"
+const val ERR_MSG_CUST_REASON_NOT_PRESENT = "Reason is mandatory for the update"
+const val ERR_MSG_CREDIT_RATING_OR_ADDRESS_MISSING = "Neither credit rating nor address is provided"
 const val CUST_ID_REGEX = "^C[\\d]{10}$"
 
 class InvalidCustomerDataException(errorMsg: String) : Exception(errorMsg)
@@ -77,5 +80,31 @@ fun getCustomer(id: String): Customer {
     InvalidCustomerDataException::class
 )
 fun updateCustomer(customer: Customer): Int {
-    return 0
+    //1. Name and id are mandatory
+    if (customer.name.isEmpty() || customer.id.isEmpty()) {
+        throw InvalidCustomerDataException(errorMsg = ERR_MSG_NAME_ID_IS_MANDATORY)
+    }
+    //2. Check if the reason is present. If reason is not present throw exception
+    if (customer.reasonForUpdate.isNullOrEmpty()) {
+        throw InvalidCustomerDataException(errorMsg = ERR_MSG_CUST_REASON_NOT_PRESENT)
+    }
+    //3. Check if address or credit rating present
+    if (!(!customer.address.isNullOrEmpty() || customer.creditRating > 0)) {
+        throw InvalidCustomerDataException(errorMsg = ERR_MSG_CREDIT_RATING_OR_ADDRESS_MISSING)
+    }
+    //4. Check if customer with a given id exist in db. If not throw exception
+    val existingCustomer = getCustomer(customer.id)
+    //5. Check if customer with the same id has the same name. If not throw exception
+    if (!(existingCustomer.name == customer.name && existingCustomer.id == customer.id)) {
+        throw InvalidCustomerDataException(
+            errorMsg = String.format(
+                ERR_MSG_CUST_ID_NAME_NOT_CONSISTENT,
+                existingCustomer.id,
+                existingCustomer.name
+            )
+        )
+    }
+    //6. Call update customer
+    return CommandExecutor.persistenceManager!!.update(customer = customer)
+    //return -1
 }
