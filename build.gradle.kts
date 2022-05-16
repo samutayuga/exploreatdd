@@ -4,6 +4,9 @@ val jupyterVersion: String by project
 val kotlinMockVersion: String by project
 val exposedVersion: String by project
 val postgresqlVersion: String by project
+val hikariCPVersion: String by project
+val pgjdbcVersion:String by project
+val h2DbVersion:String by project
 plugins {
     kotlin("jvm") version "1.6.21"
     application
@@ -48,11 +51,12 @@ dependencies {
     implementation("org.jetbrains.exposed:exposed-dao:$exposedVersion")
     implementation("org.jetbrains.exposed:exposed-jdbc:$exposedVersion")
     implementation("org.postgresql:postgresql:$postgresqlVersion")
-    implementation("com.zaxxer:HikariCP:3.3.1")
-    implementation("com.impossibl.pgjdbc-ng", "pgjdbc-ng", "0.8.3")
+    implementation("com.zaxxer:HikariCP:$hikariCPVersion")
+    implementation("com.impossibl.pgjdbc-ng:pgjdbc-ng:$pgjdbcVersion")
 
     //testImplementation("org.postgresql:postgresql:$postgresqlVersion")
-    testImplementation("org.postgresql:postgresql:42.3.3")
+    testImplementation("org.postgresql:postgresql:$postgresqlVersion")
+    implementation("com.h2database:h2:$h2DbVersion")
 }
 tasks.test {
     useJUnitPlatform()

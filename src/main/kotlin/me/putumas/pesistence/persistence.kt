@@ -59,7 +59,7 @@ fun buildHikariDataSource(): HikariDataSource {
 
 
 class PersistenceManagerImpl : PersistenceManager {
-    val db: Database = Database.connect(datasource = buildHikariDataSource())
+    var db: Database = Database.connect(datasource = buildHikariDataSource())
     override fun insert(customer: Customer): Int {
         var insertedCount = 0
         transaction(db) {

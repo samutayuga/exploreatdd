@@ -1,54 +1,71 @@
 package me.putumas.persistence
 
+import com.zaxxer.hikari.HikariConfig
+import com.zaxxer.hikari.HikariDataSource
 import me.putumas.pesistence.Customer
 import me.putumas.pesistence.Customers
 import me.putumas.pesistence.PersistenceManagerImpl
+import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.SchemaUtils
 import org.jetbrains.exposed.sql.StdOutSqlLogger
 import org.jetbrains.exposed.sql.addLogger
 import org.jetbrains.exposed.sql.transactions.transaction
+import org.junit.jupiter.api.AfterAll
+import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Disabled
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 
+fun buildHikariDataSourceInMemory(): HikariDataSource {
+    val config = HikariConfig()
+    config.driverClassName = "org.h2.Driver"
+    config.jdbcUrl = "jdbc:h2:mem:creditrating;MODE=MYSQL"
+    config.maximumPoolSize = 3
+    config.isAutoCommit = false
+    config.transactionIsolation = "TRANSACTION_READ_COMMITTED"
+    config.username = "creditor"
+    config.password = "creditor"
+    config.validate()
+    return HikariDataSource(config)
+}
 
 class TestPersistenceManager {
-    val persistenceManager = PersistenceManagerImpl()
 
-    val db = persistenceManager.db
 
-    @Disabled
-    @Test
-    fun createTable() {
+    //@Disabled
+    //@Test
 
-        transaction(db) {
-            addLogger(StdOutSqlLogger)
-            SchemaUtils.create(Customers)
-        }
-
-    }
 
     companion object {
-        //@JvmStatic
+        val persistenceManager = PersistenceManagerImpl()
+        var db: Database? = null
 
-    }
+        @JvmStatic
+        @BeforeAll
+        fun createTable() {
+            persistenceManager.db = Database.connect(datasource = buildHikariDataSourceInMemory())
+            db = persistenceManager.db
+            transaction() {
+                addLogger(StdOutSqlLogger)
+                SchemaUtils.create(Customers)
+            }
 
-    @Disabled
-    @Test
-    fun testDropTable() {
-        transaction(db) {
-            addLogger(StdOutSqlLogger)
-            SchemaUtils.drop(Customers)
+        }
+
+        @AfterAll
+        @JvmStatic
+        fun testDropTable() {
+            transaction(db) {
+                addLogger(StdOutSqlLogger)
+                SchemaUtils.drop(Customers)
+            }
+
         }
 
     }
 
-    @BeforeTest
-    fun beforeTest() {
-        val deletedRecord = persistenceManager.delete("C1234567891")
-    }
 
     @Test
     fun testCrud() {
