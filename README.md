@@ -60,6 +60,8 @@ execution relies on build.gradle
 We should stop at some point at early phase of dev,
 to not continue with in implementation but write unit test
 
+![TDD in action](tddinaction.png)
+
 * Convert the requirement into unit test
 ```kotlin
 class TestUpdateCustomer {
