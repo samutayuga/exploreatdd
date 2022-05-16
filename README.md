@@ -63,71 +63,52 @@ to not continue with in implementation but write unit test
 ![TDD in action](tddinaction.png)
 
 * Convert the requirement into unit test
+
+Typical JIRA User story description regarding a feature look like this,
+```text
+Given a customer with id does not exists in the system
+ 
+When a client add this customer to the system
+
+Then the new record is created for this customer
+```
+
+
 ```kotlin
-class TestUpdateCustomer {
-    
+class TestAddCustomerCommand {
+
+
     /**
-     * This is a negative test case
-     * to validate
-     * /1 if the reason for update is mandatory and error message is correct
-     * /2 if id and name are mandatory
-     * /3 if credit rating or address is mandatory
+     * This is the negative scenario with invalid input
+     * Create a customer object with empty name
+     * Call the addCustomer function
+     * It should respond with exception and an error message accordingly
+     * There are several possible negative scenarios pertaining to the
+     * invalid input. eg. missing name, missing id, missing both id and name
      */
-    @ParameterizedTest
+    @ParameterizedTest(name = "{0} with argument {1}")
     @MethodSource
-    fun updateCustomerInvalidInput(what: String, customer: Customer, expectedMsg: String) {
-
+    fun testAddCustomerInvalidInput(testLabel: String, customer: Customer, expectedMessage: String) {
         
 
     }
 
     /**
-     * This is a negative test case
-     * for the inconsistency between name and id that passed by the client
-     * with the database record
-     * The exception will be thrown
-     * Test will verify the error message
+     * This is the negative test cases where the customer with the same id
+     * exists in database. The exception is thrown by the PersistenceManager layer
+     * since it has direct access to database.
      */
     @Test
-    fun updateCustomerIdNameInconsistent() {
-        
+    fun testAddCustomerWithDuplicateEntry() {
         
     }
 
     /**
-     * This is negative test case
-     * for updating the non existing customer
-     * The exception with correct message
-     * will be thrown
+     * This is the nominal test cases
+     *
      */
     @Test
-    fun updateCustomerNotFound() {
-
-    }
-
-    /**
-     * This is negative test case
-     * when client pass customer data without any
-     * changes compared to the database record
-     * The following are attribute that allowed for update
-     * address, credit rating
-     */
-    @Test
-    fun updateCustomerNothingToUpdate() {
-
-    }
-
-    /**
-     * This is nominal test case
-     * when the update is done successfully
-     * and persistence manager returns successful
-     * \1 when both address and credit rating present
-     * \2 when only address present
-     * \3 when only credit rating present
-     */
-    @ParameterizedTest(name = "{1} with {2}")
-    @MethodSource
-    fun updateCustomerNominalCase(what: TestCase, label: String, customer: Customer) {
+    fun testAddCustomerNominalCase() {
         
     }
 }

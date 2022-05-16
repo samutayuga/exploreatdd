@@ -165,7 +165,7 @@ class TestUpdateCustomer {
      */
     @Test
     fun updateCustomerNotFound() {
-
+        assertFails(message = "Let failed this test...") { }
     }
 
     /**
@@ -177,7 +177,7 @@ class TestUpdateCustomer {
      */
     @Test
     fun updateCustomerNothingToUpdate() {
-
+        assertFails(message = "Let failed this test...") { }
     }
 
     /**

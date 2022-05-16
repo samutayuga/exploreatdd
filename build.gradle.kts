@@ -2,6 +2,8 @@ import org.jetbrains.kotlin.daemon.nowSeconds
 val kotlinVersion: String by project
 val jupyterVersion: String by project
 val kotlinMockVersion: String by project
+val exposedVersion: String by project
+val postgresqlVersion: String by project
 plugins {
     kotlin("jvm") version "1.6.21"
     application
@@ -41,6 +43,16 @@ dependencies {
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:${jupyterVersion}")
     testImplementation("org.junit.jupiter:junit-jupiter-params:${jupyterVersion}")
     testImplementation("io.mockk:mockk:${kotlinMockVersion}")
+
+    implementation("org.jetbrains.exposed:exposed-core:$exposedVersion")
+    implementation("org.jetbrains.exposed:exposed-dao:$exposedVersion")
+    implementation("org.jetbrains.exposed:exposed-jdbc:$exposedVersion")
+    implementation("org.postgresql:postgresql:$postgresqlVersion")
+    implementation("com.zaxxer:HikariCP:3.3.1")
+    implementation("com.impossibl.pgjdbc-ng", "pgjdbc-ng", "0.8.3")
+
+    //testImplementation("org.postgresql:postgresql:$postgresqlVersion")
+    testImplementation("org.postgresql:postgresql:42.3.3")
 }
 tasks.test {
     useJUnitPlatform()
