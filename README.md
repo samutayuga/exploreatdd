@@ -60,3 +60,75 @@ execution relies on build.gradle
 We should stop at some point at early phase of dev,
 to not continue with in implementation but write unit test
 
+* Convert the requirement into unit test
+```kotlin
+class TestUpdateCustomer {
+    
+    /**
+     * This is a negative test case
+     * to validate
+     * /1 if the reason for update is mandatory and error message is correct
+     * /2 if id and name are mandatory
+     * /3 if credit rating or address is mandatory
+     */
+    @ParameterizedTest
+    @MethodSource
+    fun updateCustomerInvalidInput(what: String, customer: Customer, expectedMsg: String) {
+
+        
+
+    }
+
+    /**
+     * This is a negative test case
+     * for the inconsistency between name and id that passed by the client
+     * with the database record
+     * The exception will be thrown
+     * Test will verify the error message
+     */
+    @Test
+    fun updateCustomerIdNameInconsistent() {
+        
+        
+    }
+
+    /**
+     * This is negative test case
+     * for updating the non existing customer
+     * The exception with correct message
+     * will be thrown
+     */
+    @Test
+    fun updateCustomerNotFound() {
+
+    }
+
+    /**
+     * This is negative test case
+     * when client pass customer data without any
+     * changes compared to the database record
+     * The following are attribute that allowed for update
+     * address, credit rating
+     */
+    @Test
+    fun updateCustomerNothingToUpdate() {
+
+    }
+
+    /**
+     * This is nominal test case
+     * when the update is done successfully
+     * and persistence manager returns successful
+     * \1 when both address and credit rating present
+     * \2 when only address present
+     * \3 when only credit rating present
+     */
+    @ParameterizedTest(name = "{1} with {2}")
+    @MethodSource
+    fun updateCustomerNominalCase(what: TestCase, label: String, customer: Customer) {
+        
+    }
+}
+```
+* Write the failing test cases
+* Make the test passed
