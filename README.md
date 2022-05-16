@@ -55,6 +55,20 @@ execution relies on build.gradle
 
 ![Gradle Life Cycle](cd.png)
 
+`High Level Separation of concern`
+
+![SD](sd.png)
+
+Basically for the simplest CRUD use case, it is good to separate the responsibilities into two separate
+class.
+
+* Business logic layer
+Perform high level validation, such as sanitize the input and provide an API to the client
+
+* Persistence layer
+Interact with DB, handle the DB response including how to wrap low level DB exception into more client
+friendly exception.
+
 `TDD approach`
 
 We should stop at some point at early phase of dev,
