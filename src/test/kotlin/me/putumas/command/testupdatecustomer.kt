@@ -49,6 +49,17 @@ class TestUpdateCustomer {
                         creditRating = 555
                     ),
                     ERR_MSG_NAME_ID_IS_MANDATORY
+                ),
+                Arguments.of(
+                    "Negative Test to verify the behaviour when id is incorrect format",
+                    Customer(
+                        name = "Jack",
+                        id = "C123456789",
+                        reasonForUpdate = "Customer have bought new palace",
+                        address = "Bt Batok",
+                        creditRating = 555
+                    ),
+                    String.format(ERR_MSG_CUST_ID_INVALID, "C123456789")
                 )
 
             )
@@ -125,7 +136,8 @@ class TestUpdateCustomer {
      */
     @Test
     fun updateCustomerIdNameInconsistent() {
-        CommandExecutor.persistenceManager = buildPersistenceMock(TestCase.UPDATE_ID_NAME_NOT_CONSISTENT)
+        val persistenceManagerMock = buildPersistenceMock(TestCase.UPDATE_ID_NAME_NOT_CONSISTENT)
+        CommandExecutor.persistenceManager = persistenceManagerMock
         val exceptionInconsistency = assertFailsWith<InvalidCustomerDataException> {
             updateCustomer(
                 Customer(
@@ -141,6 +153,7 @@ class TestUpdateCustomer {
             String.format(ERR_MSG_CUST_ID_NAME_NOT_CONSISTENT, "C1234567891", "Jack"),
             exceptionInconsistency.message
         )
+        verifyInteractionToMock(TestCase.UPDATE_ID_NAME_NOT_CONSISTENT, persistenceManagerMock)
     }
 
     /**
@@ -177,7 +190,9 @@ class TestUpdateCustomer {
     @ParameterizedTest(name = "{1} with {2}")
     @MethodSource
     fun updateCustomerNominalCase(what: TestCase, label: String, customer: Customer) {
-        CommandExecutor.persistenceManager = buildPersistenceMock(what)
+        val persistenceManagerMock = buildPersistenceMock(what)
+        CommandExecutor.persistenceManager = persistenceManagerMock
         assertEquals(1, updateCustomer(customer = customer))
+        verifyInteractionToMock(what, persistenceManagerMock)
     }
 }
