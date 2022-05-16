@@ -67,17 +67,17 @@ class PersistenceManagerImpl : PersistenceManager {
         var insertedCount = 0
         transaction(db) {
             addLogger(StdOutSqlLogger)
-            try {
+            insertedCount = try {
                 val stmt = Customers.insert {
                     it[id] = customer.id
                     it[name] = customer.name
                 }
-                insertedCount = stmt.insertedCount
+                stmt.insertedCount
             } catch (exception: ExposedSQLException) {
-                if (exception.message!!.contains("org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException")) {
-                    throw CustomerExistsException(String.format(ERR_MSG_CUST_EXISTS, customer.id))
-                }
-                throw java.lang.Exception("error while inserting ${customer.id} err=${exception.stackTrace}")
+                // if (exception.message!!.contains("org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException")) {
+                throw CustomerExistsException(String.format(ERR_MSG_CUST_EXISTS, customer.id))
+                //}
+                // throw java.lang.Exception("error while inserting ${customer.id} err=${exception.stackTrace}")
 
             }
 
@@ -89,7 +89,7 @@ class PersistenceManagerImpl : PersistenceManager {
         var customer: Customer? = null
         transaction(db) {
             addLogger(StdOutSqlLogger)
-            val q = Customers.select { Customers.id eq id }.limit(1).map {
+            customer = Customers.select { Customers.id eq id }.limit(1).map {
                 Customer(
                     id = it[Customers.id],
                     name = it[Customers.name],
@@ -97,13 +97,15 @@ class PersistenceManagerImpl : PersistenceManager {
                     creditRating = it[Customers.creditRating],
                     reasonForUpdate = it[Customers.reasonForUpdate]
                 )
+            }.let {
+                if (it.isEmpty()) throw CustomerDoesNotExistException(
+                    String.format(
+                        ERR_MSG_CUST_NOT_FOUND,
+                        id
+                    )
+                ) else it.reduce { _, customer -> customer }
             }
-            if (q.isEmpty()) {
-                throw CustomerDoesNotExistException(String.format(ERR_MSG_CUST_NOT_FOUND, id))
-            }
-            customer = q.first()
         }
-        //  addLogger(StdOutSqlLogger)
         return customer
 
     }

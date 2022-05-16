@@ -11,9 +11,10 @@ import org.jetbrains.exposed.sql.addLogger
 import org.jetbrains.exposed.sql.transactions.transaction
 import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.BeforeAll
-import org.junit.jupiter.api.Disabled
-import java.sql.SQLIntegrityConstraintViolationException
-import kotlin.test.*
+import kotlin.test.Test
+import kotlin.test.assertEquals
+import kotlin.test.assertFailsWith
+import kotlin.test.assertNotNull
 
 fun buildHikariDataSourceInMemory(): HikariDataSource {
     val config = HikariConfig()
@@ -90,6 +91,11 @@ class TestPersistenceManager {
         assertEquals(String.format(ERR_MSG_CUST_EXISTS, "C1234567891"), exception.message)
         val deletedRecord = persistenceManager.delete("C1234567891")
         assertEquals(1, deletedRecord)
+        val nodataAfterDeleted =
+            assertFailsWith<CustomerDoesNotExistException> { persistenceManager.get("C1234567891") }
+        assertEquals(String.format(ERR_MSG_CUST_NOT_FOUND, "C1234567891"), nodataAfterDeleted.message)
+        //persistenceManager.delete("C1234567891")
+        //persistenceManager.update(existingCustoer)
 
     }
 }
