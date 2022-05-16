@@ -41,7 +41,9 @@ interface PersistenceManager {
     @Throws(CustomerExistsException::class)
     fun insert(customer: Customer): Int
 
+    @Throws(CustomerDoesNotExistException::class)
     fun get(id: String): Customer?
+    @Throws(CustomerDoesNotExistException::class)
     fun update(customer: Customer): Int
     fun delete(id: String): Int
 //    fun list(): List<Customer>
