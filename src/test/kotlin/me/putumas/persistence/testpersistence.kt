@@ -2,9 +2,8 @@ package me.putumas.persistence
 
 import com.zaxxer.hikari.HikariConfig
 import com.zaxxer.hikari.HikariDataSource
-import me.putumas.pesistence.Customer
-import me.putumas.pesistence.Customers
-import me.putumas.pesistence.PersistenceManagerImpl
+import me.putumas.command.ERR_MSG_CUST_NOT_FOUND
+import me.putumas.pesistence.*
 import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.SchemaUtils
 import org.jetbrains.exposed.sql.StdOutSqlLogger
@@ -13,10 +12,8 @@ import org.jetbrains.exposed.sql.transactions.transaction
 import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Disabled
-import kotlin.test.BeforeTest
-import kotlin.test.Test
-import kotlin.test.assertEquals
-import kotlin.test.assertNotNull
+import java.sql.SQLIntegrityConstraintViolationException
+import kotlin.test.*
 
 fun buildHikariDataSourceInMemory(): HikariDataSource {
     val config = HikariConfig()
@@ -32,12 +29,6 @@ fun buildHikariDataSourceInMemory(): HikariDataSource {
 }
 
 class TestPersistenceManager {
-
-
-    //@Disabled
-    //@Test
-
-
     companion object {
         val persistenceManager = PersistenceManagerImpl()
         var db: Database? = null
@@ -69,6 +60,10 @@ class TestPersistenceManager {
 
     @Test
     fun testCrud() {
+        //get the nonexistent data
+        val noDataFoundException =
+            assertFailsWith<CustomerDoesNotExistException> { persistenceManager.get("C1234567891") }
+        assertEquals(String.format(ERR_MSG_CUST_NOT_FOUND, "C1234567891"), noDataFoundException.message)
         val affectedRecord = persistenceManager.insert(Customer(name = "jack", id = "C1234567891"))
         assertEquals(1, affectedRecord)
         val existingCustoer = persistenceManager.get(id = "C1234567891")
@@ -82,6 +77,17 @@ class TestPersistenceManager {
         assertEquals("Just moved...", existingCustoerAgain.reasonForUpdate)
         assertEquals(500, existingCustoerAgain.creditRating)
 
+        //try to insert the same
+        val exception =
+            assertFailsWith<CustomerExistsException> {
+                persistenceManager.insert(
+                    Customer(
+                        name = "jack",
+                        id = "C1234567891"
+                    )
+                )
+            }
+        assertEquals(String.format(ERR_MSG_CUST_EXISTS, "C1234567891"), exception.message)
         val deletedRecord = persistenceManager.delete("C1234567891")
         assertEquals(1, deletedRecord)
 

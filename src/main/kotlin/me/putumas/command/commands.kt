@@ -7,7 +7,7 @@ import me.putumas.pesistence.PersistenceManager
 
 const val ERR_MSG_NAME_ID_IS_MANDATORY = "Both 'name' and 'id' are required"
 const val ERR_MSG_CUST_ID_INVALID = "%s does not follow C1234567891 format"
-const val ERR_MSG_CUST_NOT_FOUND = "Customer with id '%s' does does not exist"
+const val ERR_MSG_CUST_NOT_FOUND = "Customer with id '%s' does not exist"
 const val ERR_MSG_CUST_ID_NAME_NOT_CONSISTENT = "Customer with id '%s' and name %s has different name in the system"
 const val ERR_MSG_CUST_REASON_NOT_PRESENT = "Reason is mandatory for the update"
 const val ERR_MSG_CREDIT_RATING_OR_ADDRESS_MISSING = "Neither credit rating nor address is provided"
