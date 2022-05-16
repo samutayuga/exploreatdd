@@ -28,6 +28,7 @@ object CommandExecutor {
      * cycle of the application
      */
 
+
     init {
 
     }
@@ -75,6 +76,11 @@ fun getCustomer(id: String): Customer {
         ?: throw CustomerDoesNotExistException(errorMessage = String.format(ERR_MSG_CUST_NOT_FOUND, id))
 }
 
+/**
+ * Update certain attribute of the customer
+ * The fields allowed for the update are, creditRating and address
+ * Each update need a reason.
+ */
 @Throws(
     CustomerDoesNotExistException::class,
     InvalidCustomerDataException::class
@@ -84,17 +90,21 @@ fun updateCustomer(customer: Customer): Int {
     if (customer.name.isEmpty() || customer.id.isEmpty()) {
         throw InvalidCustomerDataException(errorMsg = ERR_MSG_NAME_ID_IS_MANDATORY)
     }
-    //2. Check if the reason is present. If reason is not present throw exception
+    //2. Customer id has to be in a specific format, eg. CXXXXXXXXX, alphabet C uppercase followed by 10 digit number
+    if (!customer.id.matches(Regex(CUST_ID_REGEX))) {
+        throw InvalidCustomerDataException(errorMsg = String.format(ERR_MSG_CUST_ID_INVALID, customer.id))
+    }
+    //3. Check if the reason is present. If reason is not present throw exception
     if (customer.reasonForUpdate.isNullOrEmpty()) {
         throw InvalidCustomerDataException(errorMsg = ERR_MSG_CUST_REASON_NOT_PRESENT)
     }
-    //3. Check if address or credit rating present
+    //4. Check if address or credit rating present
     if (!(!customer.address.isNullOrEmpty() || customer.creditRating > 0)) {
         throw InvalidCustomerDataException(errorMsg = ERR_MSG_CREDIT_RATING_OR_ADDRESS_MISSING)
     }
-    //4. Check if customer with a given id exist in db. If not throw exception
+    //5. Check if customer with a given id exist in db. If not throw exception
     val existingCustomer = getCustomer(customer.id)
-    //5. Check if customer with the same id has the same name. If not throw exception
+    //6. Check if customer with the same id has the same name. If not throw exception
     if (!(existingCustomer.name == customer.name && existingCustomer.id == customer.id)) {
         throw InvalidCustomerDataException(
             errorMsg = String.format(
@@ -104,7 +114,7 @@ fun updateCustomer(customer: Customer): Int {
             )
         )
     }
-    //6. Call update customer
+    //7. Call update customer
     return CommandExecutor.persistenceManager!!.update(customer = customer)
     //return -1
 }
