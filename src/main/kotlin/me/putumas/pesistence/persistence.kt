@@ -3,6 +3,7 @@ package me.putumas.pesistence
 import com.zaxxer.hikari.HikariConfig
 import com.zaxxer.hikari.HikariDataSource
 import me.putumas.command.ERR_MSG_CUST_NOT_FOUND
+import me.putumas.command.InvalidCustomerDataException
 import org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException
 import org.jetbrains.exposed.exceptions.ExposedSQLException
 import org.jetbrains.exposed.sql.*
@@ -21,6 +22,8 @@ data class Customer(
 )
 
 const val ERR_MSG_CUST_EXISTS = "Customer with id '%s' exists"
+const val ERR_MSG_CUST_FIELD_INVALID =
+    "Customer name cannot be longer than 200 characters and address cannot be longer than 400 characters"
 
 class CustomerExistsException(errorMessage: String) : Exception(errorMessage)
 class CustomerDoesNotExistException(errorMessage: String) : Exception(errorMessage)
@@ -43,6 +46,7 @@ interface PersistenceManager {
 
     @Throws(CustomerDoesNotExistException::class)
     fun get(id: String): Customer?
+
     @Throws(CustomerDoesNotExistException::class)
     fun update(customer: Customer): Int
     fun delete(id: String): Int
@@ -73,6 +77,9 @@ class PersistenceManagerImpl : PersistenceManager {
                 val stmt = Customers.insert {
                     it[id] = customer.id
                     it[name] = customer.name
+                    it[address] = customer.address
+                    it[creditRating] = customer.creditRating
+                    it[reasonForUpdate] = customer.reasonForUpdate
                 }
                 stmt.insertedCount
             } catch (exception: ExposedSQLException) {
@@ -81,6 +88,8 @@ class PersistenceManagerImpl : PersistenceManager {
                 //}
                 // throw java.lang.Exception("error while inserting ${customer.id} err=${exception.stackTrace}")
 
+            } catch (illegalArgument: IllegalArgumentException) {
+                throw InvalidCustomerDataException(ERR_MSG_CUST_FIELD_INVALID)
             }
 
         }

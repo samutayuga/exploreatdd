@@ -129,3 +129,31 @@ class TestAddCustomerCommand {
 ```
 * Write the failing test cases
 * Make the test passed
+
+## Setup Gradle Build
+TDD is just a theoretical approach, in the end developer need to decide how to deal with its nitty-gritty aspect.
+How to do it is up to the developer. I believe there are many ways to go this direction and still gets the thing right
+There are some frameworks that is able to capture the metrics for code coverage from the unit test execution.
+Remember that, with TDD the code coverage should be higher. The coverage can be quantified using such tool, like `kover`.
+So, in general we need to setup the gradle so that, it is able to produce the coverage report whenever we run the build
+
+Here it is,
+`To provide the unit test dependencies`
+```kotlin
+dependencies {
+    ...
+    testImplementation(kotlin("test"))
+    testImplementation("org.junit.jupiter:junit-jupiter-api:${jupyterVersion}")
+    testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:${jupyterVersion}")
+    testImplementation("org.junit.jupiter:junit-jupiter-params:${jupyterVersion}")
+    testImplementation("io.mockk:mockk:${kotlinMockVersion}")
+    //in memory database
+    implementation("com.h2database:h2:$h2DbVersion")
+    
+}
+//code coverage
+plugins {
+    ...
+    id("org.jetbrains.kotlinx.kover") version "0.4.2"
+}
+```
